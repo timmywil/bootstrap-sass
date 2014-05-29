@@ -69,27 +69,26 @@
 
       that.$element
         .show()
-        .scrollTop(0)
 
-      if (transition) {
-        that.$element[0].offsetWidth // force reflow
-      }
+      // Push the animation to the end of the stack having just
+      // changed the display property
+      setTimeout(function() {
+        that.$element
+          .addClass('in')
+          .attr('aria-hidden', false)
 
-      that.$element
-        .addClass('in')
-        .attr('aria-hidden', false)
+        that.enforceFocus()
 
-      that.enforceFocus()
+        var e = $.Event('shown.bs.modal', { relatedTarget: _relatedTarget })
 
-      var e = $.Event('shown.bs.modal', { relatedTarget: _relatedTarget })
-
-      transition ?
-        that.$element.find('.modal-dialog') // wait for modal to slide in
-          .one($.support.transition.end, function () {
-            that.$element.trigger('focus').trigger(e)
-          })
-          .emulateTransitionEnd(300) :
-        that.$element.trigger('focus').trigger(e)
+        transition ?
+          that.$element.find('.modal-dialog') // wait for modal to slide in
+            .one($.support.transition.end, function () {
+              that.$element.trigger('focus').trigger(e)
+            })
+            .emulateTransitionEnd(300) :
+          that.$element.trigger('focus').trigger(e)
+      })
     })
   }
 
@@ -173,17 +172,18 @@
           : this.hide.call(this)
       }, this))
 
-      if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
+      // Push animation to end of stack having just appended the HTML
+      setTimeout(function() {
+        this.$backdrop.addClass('in')
 
-      this.$backdrop.addClass('in')
+        if (!callback) return
 
-      if (!callback) return
-
-      doAnimate ?
-        this.$backdrop
-          .one($.support.transition.end, callback)
-          .emulateTransitionEnd(150) :
-        callback()
+        doAnimate ?
+          this.$backdrop
+            .one($.support.transition.end, callback)
+            .emulateTransitionEnd(150) :
+          callback()
+      })
 
     } else if (!this.isShown && this.$backdrop) {
       this.$backdrop.removeClass('in')
