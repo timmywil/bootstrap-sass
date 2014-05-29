@@ -125,7 +125,8 @@
     var slidEvent = $.Event('slid.bs.carousel', { relatedTarget: relatedTarget, direction: direction }) // yes, "slid"
     if ($.support.transition && this.$element.hasClass('slide')) {
       $next.addClass(type)
-      // Push to end of stack for animation
+      // push animation to the end of the stack
+      // this avoids reflows
       setTimeout(function() {
         $active.addClass(direction)
         $next.addClass(direction)

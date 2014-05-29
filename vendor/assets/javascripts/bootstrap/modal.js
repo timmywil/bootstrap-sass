@@ -70,11 +70,8 @@
       that.$element
         .show()
 
-      // Push the animation to the end of the stack having just
-      // changed the display property
-      setTimeout(function() {
-        that.$element
-          .addClass('in')
+      var focusModal = function() {
+        that.$element.addClass('in')
           .attr('aria-hidden', false)
 
         that.enforceFocus()
@@ -88,7 +85,14 @@
             })
             .emulateTransitionEnd(300) :
           that.$element.trigger('focus').trigger(e)
-      })
+      }
+
+      transition ?
+        // push the animation to the end of the stack having
+        // just changed the display
+        // this avoids reflows
+        setTimeout(focusModal) :
+        focusModal()
     })
   }
 
@@ -172,18 +176,24 @@
           : this.hide.call(this)
       }, this))
 
-      // Push animation to end of stack having just appended the HTML
-      setTimeout(function() {
-        this.$backdrop.addClass('in')
+      var showBackdrop = function() {
+        that.$backdrop.addClass('in')
 
         if (!callback) return
 
         doAnimate ?
-          this.$backdrop
+          that.$backdrop
             .one($.support.transition.end, callback)
             .emulateTransitionEnd(150) :
           callback()
-      })
+      }
+
+      // push the animation to the end of the stack
+      // having just appended the element
+      // this avoids reflows
+      doAnimate ?
+        setTimeout(showBackdrop) :
+        showBackdrop()
 
     } else if (!this.isShown && this.$backdrop) {
       this.$backdrop.removeClass('in')
